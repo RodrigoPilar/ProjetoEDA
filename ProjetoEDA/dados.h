@@ -9,6 +9,10 @@
  *      - Nefasto: Armazena as coordenadas (x, y) e ponteiro para o próximo elemento.
  */
 
+#ifndef DADOS_H
+#define DADOS_H
+
+
  /// <summary>
  /// Estrutura que representa uma antena com frequência, coordenadas (x, y)
  /// e ponteiro para a próxima antena (lista ligada).
@@ -27,3 +31,5 @@ typedef struct nefasto {
     int x, y;
     struct nefasto* next;
 } Nefasto;
+
+#endif  DADOS_H
