@@ -4,7 +4,7 @@
  *  @date 2025-03-29
  *  @project EDA
  *
- *  Declara as funções para manipulação das listas de antenas e nefastos,além das funções para manipulação da matriz.
+ *  Declara as funções para manipulação das listas de antenas e nefastos,além das funções para manipulação da matriz e carregamento de uma matriz através de um ficheiro txt.
  *  
  */
 
@@ -26,7 +26,11 @@ void libertarNefastos(Nefasto* lista);
 #pragma endregion
 
 #pragma region Funções da Matriz
-char** criarMatrizComNefastos(const Antena* listaAntenas, const Nefasto* listaNefastos, int* nRows, int* nCol);
+char** criarMatrizComNefastos(const Antena* listaAntenas, int* nRows, int* nCols);
 void imprimirMatriz(char** matriz, int nRows);
 void libertarMatriz(char** matriz, int nRows);
+#pragma endregion
+
+#pragma region Funções de Carregamento de Ficheiros
+Antena* carregarAntenasDeFicheiro(const char* filename, Antena* listaExistente);
 #pragma endregion

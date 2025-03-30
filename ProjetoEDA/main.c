@@ -6,7 +6,7 @@
  *
  *  Implementa a função principal do programa, gerindo a inserção e listagem de antenas,
  *  o cálculo e listagem dos pontos com efeito nefasto, para além da criação e manipulação de uma matriz
- *  que combina antenas e nefastos.
+ *  que combina antenas e nefastos. Também é possível carregar antenas de um ficheiro txt.
  */
 
 #include <stdio.h>
@@ -14,44 +14,46 @@
 
 int main() {
     Antena* listaAntenas = NULL;
-    Nefasto* listaNefastos = NULL;
-
     int nRows, nCols;
-    int minX, minY;
     char** matriz;
 
-    //Inserção de antenas
+    // Inserção manual de várias antenas.
     listaAntenas = inserirAntena(listaAntenas, 'A', 3, 2);
     listaAntenas = inserirAntena(listaAntenas, 'A', 5, 4);
     listaAntenas = inserirAntena(listaAntenas, 'B', 1, 1);
     listaAntenas = inserirAntena(listaAntenas, 'B', 2, 2);
     listaAntenas = inserirAntena(listaAntenas, 'C', 3, 3);
-	listaAntenas = inserirAntena(listaAntenas, 'C', 15, 15);
+    listaAntenas = inserirAntena(listaAntenas, 'C', 15, 15);
+    // Listar antenas inseridas
     listarAntenas(listaAntenas);
+    // Criar e imprimir a matriz com base nas antenas inseridas
+    matriz = criarMatrizComNefastos(listaAntenas, &nRows, &nCols);
+    imprimirMatriz(matriz, nRows);
+    libertarMatriz(matriz, nRows);
 
-    // Remoção de uma antena e nova listagem
+	// Remoção de antena e nova impressão da matriz para verificar se a remoção da antena da lista foi bem sucedida
     listaAntenas = removerAntena(listaAntenas, 3, 3);
     listarAntenas(listaAntenas);
+    matriz = criarMatrizComNefastos(listaAntenas, &nRows, &nCols);
+    imprimirMatriz(matriz, nRows);
+    libertarMatriz(matriz, nRows);
 
-    // Calcula os nefastos
-    listaNefastos = calcularNefastos(listaAntenas);
-    listarNefastos(listaNefastos);
+	// Carregar antenas de ficheiro txt e imprimir, para verificar se a leitura do ficheiro foi bem sucedida
+    listaAntenas = carregarAntenasDeFicheiro("mapa.txt", listaAntenas);
+    listarAntenas(listaAntenas);
+	//Criação e impressão da matriz com base nas antenas carregadas, para verificar se a lista de antenas foi bem carregada
+    matriz = criarMatrizComNefastos(listaAntenas, &nRows, &nCols);
+    imprimirMatriz(matriz, nRows);
+    libertarMatriz(matriz, nRows);
 
+	//Remoção de uma antena e nova impressão da matriz, para verificar se atualiza a lista de antenas carregada do ficheiro txt
+    listaAntenas = removerAntena(listaAntenas, 2, 9);
+    listarAntenas(listaAntenas);
+    matriz = criarMatrizComNefastos(listaAntenas, &nRows, &nCols);
+    imprimirMatriz(matriz, nRows);
+    libertarMatriz(matriz, nRows);
 
-    // Cria a matriz combinada (insere as antenas e os nefastos)
-    matriz = criarMatrizComNefastos(listaAntenas, listaNefastos, &nRows, &nCols);
-    if (matriz != NULL) {
-        printf("\nMatriz com antenas e nefastos:\n");
-        imprimirMatriz(matriz, nRows);
-        libertarMatriz(matriz, nRows);
-    }
-    else {
-        printf("Falha na criação da matriz.\n");
-    }
-
-    // Liberta as listas
+    // Libertar memória antes de terminar
     libertarAntenas(listaAntenas);
-    libertarNefastos(listaNefastos);
-
     return 0;
 }
