@@ -18,6 +18,9 @@
     <Text Include="mapa.txt">
       <Filter>Arquivos de Recurso</Filter>
     </Text>
+    <Text Include="mapa2.txt">
+      <Filter>Arquivos de Recurso</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -26,12 +29,18 @@
     <ClCompile Include="funcoes.c">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="funcoes_grafos.c">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="funcoes.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="dados.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="funcoes_grafos.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

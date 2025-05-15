@@ -128,14 +128,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="mapa.txt" />
+    <Text Include="mapa2.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="funcoes.c" />
+    <ClCompile Include="funcoes_grafos.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="funcoes.h" />
     <ClInclude Include="dados.h" />
+    <ClInclude Include="funcoes_grafos.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
