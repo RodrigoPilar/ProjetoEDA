@@ -25,5 +25,9 @@ void dfsVisita(Grafo* g, int origem, int* visitado);
 void dfs(Grafo* g, int indiceOrigem);
 void bfsVisita(Grafo* g, int origem);
 void bfs(Grafo* g, int indiceOrigem);
+void listarTodosOsCaminhos(Grafo* g, int origem, int destino);
+void caminhosAux(Grafo* g, int atual, int destino, int* visitado, int* caminho, int profundidade);
+void listarIntersecoesEntreFrequencias(Grafo* g, char freqA, char freqB, float distMax);
+
 
 #endif  FUNCOES_GRAFOS_H

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "funcoes_grafos.h"
 
  /// <summary>
@@ -54,7 +55,6 @@ bool inserirAresta(Grafo* g, int origem, int destino) {
 
     Adjacente** atual = &g->vertices[origem].adjacentes;
 
-    // Inserção ordenada por índice do destino
     while (*atual != NULL && (*atual)->destino < destino) {
         atual = &(*atual)->seguinte;
     }
@@ -64,6 +64,7 @@ bool inserirAresta(Grafo* g, int origem, int destino) {
 
     return true;
 }
+
 
 /// <summary>
 /// Cria arestas entre antenas com a mesma frequência no grafo.
@@ -97,12 +98,12 @@ bool carregarGrafoDeMapa(Grafo* g, const char* ficheiro) {
     }
 
     char linha[100];
-    int linhaIdx = 1;
+    int linhaIdx = 0;
 
     while (fgets(linha, sizeof(linha), fp)) {
         for (int col = 0; linha[col] != '\0' && linha[col] != '\n'; col++) {
             if (linha[col] != '.') {
-                if (!inserirVertice(g, linha[col], linhaIdx, col + 1)) {
+                if (!inserirVertice(g, linha[col], linhaIdx, col)) {
                     fclose(fp);
                     return false;
                 }
@@ -126,7 +127,7 @@ bool carregarGrafoDeMapa(Grafo* g, const char* ficheiro) {
 void listarVerticesGrafo(Grafo g) {
     printf("Vertices (Antenas):\n");
     for (int i = 0; i < g.tamanho; i++) {
-        printf("  [%d] %c (%d, %d)\n", i + 1, g.vertices[i].freq, g.vertices[i].x, g.vertices[i].y);
+        printf("  [%d] %c (%d, %d)\n", i , g.vertices[i].freq, g.vertices[i].x, g.vertices[i].y);
     }
 }
 
@@ -139,7 +140,7 @@ void listarArestasGrafo(Grafo g) {
     printf("\n Ligacoes entre antenas:\n");
 
     for (int i = 0; i < g.tamanho; i++) {
-        printf("[%d] %c (%d, %d) esta ligado a:\n", i + 1, g.vertices[i].freq, g.vertices[i].x, g.vertices[i].y);
+        printf("[%d] %c (%d, %d) esta ligado a:\n", i , g.vertices[i].freq, g.vertices[i].x, g.vertices[i].y);
 
         Adjacente* adj = g.vertices[i].adjacentes;
         if (!adj) {
@@ -149,7 +150,7 @@ void listarArestasGrafo(Grafo g) {
         while (adj != NULL) {
             int dest = adj->destino;
             printf("   -> [%d] %c (%d, %d)\n",
-                dest + 1,
+                dest,
                 g.vertices[dest].freq,
                 g.vertices[dest].x,
                 g.vertices[dest].y);
@@ -179,12 +180,13 @@ int encontrarIndicePorCoordenadas(Grafo* g, int x, int y) {
 }
 
 /// <summary>
-/// Função auxiliar recursiva para a procura em profundidade (DFS).
-/// Marca vértices como visitados e imprime as suas coordenadas.
+/// Função auxiliar recursiva que implementa a lógica da procura em profundidade (DFS).
+/// Marca o vértice atual como visitado, imprime as suas coordenadas, e continua a travessia
+/// para os vértices adjacentes não visitados.
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
-/// <param name="atual">Índice do vértice atual.</param>
-/// <param name="visitado">Array de vértices visitados.</param>
+/// <param name="atual">Índice do vértice atual na travessia.</param>
+/// <param name="visitado">Array que regista os vértices já visitados.</param>
 void dfsVisita(Grafo* g, int atual, int* visitado) {
     visitado[atual] = 1;
     printf("(%d, %d) - %c\n", g->vertices[atual].x, g->vertices[atual].y, g->vertices[atual].freq);
@@ -199,7 +201,8 @@ void dfsVisita(Grafo* g, int atual, int* visitado) {
 }
 
 /// <summary>
-/// Realiza uma procura em profundidade (DFS) a partir de um vértice do grafo (identificado pelo índice).
+/// Inicia a procura em profundidade (DFS) no grafo a partir de um vértice específico.
+/// Mostra na consola os vértices visitados, na ordem da travessia, incluindo frequência e coordenadas.
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
 /// <param name="indiceOrigem">Índice do vértice de partida.</param>
@@ -207,11 +210,11 @@ void dfs(Grafo* g, int indiceOrigem) {
     int visitado[1000] = { 0 };
 
     if (indiceOrigem < 0 || indiceOrigem >= g->tamanho) {
-        printf("Índice de vértice inválido: %d\n", indiceOrigem);
+        printf("Índice de vertice invalido: %d\n", indiceOrigem);
         return;
     }
 
-    printf("DFS iniciada a partir do vértice [%d] %c (%d, %d):\n",
+    printf("DFS iniciada a partir do vertice [%d] %c (%d, %d):\n",
         indiceOrigem + 1,
         g->vertices[indiceOrigem].freq,
         g->vertices[indiceOrigem].x,
@@ -222,11 +225,11 @@ void dfs(Grafo* g, int indiceOrigem) {
 
 
 /// <summary>
-/// Função auxiliar que executa a travessia em largura (BFS) a partir de um vértice.
-/// Visita todos os vértices alcançáveis e imprime as respetivas coordenadas.
+/// Função auxiliar que executa a travessia em largura (BFS) a partir de um vértice inicial.
+/// Utiliza uma fila para visitar os vértices por níveis, imprimindo as suas coordenadas à medida que são visitados.
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
-/// <param name="origem">Índice do vértice de partida.</param>
+/// <param name="origem">Índice do vértice de origem.</param>
 void bfsVisita(Grafo* g, int origem) {
     int visitado[1000] = { 0 };
     int fila[1000];
@@ -252,23 +255,118 @@ void bfsVisita(Grafo* g, int origem) {
 }
 
 /// <summary>
-/// Realiza uma procura em largura (BFS) a partir de um vértice do grafo (identificado pelo índice).
+/// Inicia a procura em largura (BFS) no grafo a partir de um vértice indicado.
+/// Imprime os vértices visitados por ordem de nível, juntamente com as suas coordenadas e frequência.
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
-/// <param name="indiceOrigem">Índice do vértice de partida.</param>
+/// <param name="indiceOrigem">Índice do vértice de origem.</param>
 void bfs(Grafo* g, int indiceOrigem) {
     if (indiceOrigem < 0 || indiceOrigem >= g->tamanho) {
-        printf("Índice de vértice inválido: %d\n", indiceOrigem);
+        printf("Índice de vertice invalido: %d\n", indiceOrigem);
         return;
     }
 
-    printf("BFS iniciada a partir do vértice [%d] %c (%d, %d):\n",
+    printf("BFS iniciada a partir do vertice [%d] %c (%d, %d):\n",
         indiceOrigem + 1,
         g->vertices[indiceOrigem].freq,
         g->vertices[indiceOrigem].x,
         g->vertices[indiceOrigem].y);
 
     bfsVisita(g, indiceOrigem);
+}
+
+/// <summary>
+/// Função recursiva auxiliar que identifica todos os caminhos possíveis entre dois vértices do grafo.
+/// A travessia é feita com backtracking, garantindo que não há ciclos e que todos os caminhos válidos são explorados.
+/// Quando um caminho é encontrado, é imediatamente impresso na consola.
+/// </summary>
+/// <param name="g">Ponteiro para o grafo.</param>
+/// <param name="atual">Índice do vértice atual no caminho.</param>
+/// <param name="destino">Índice do vértice de destino.</param>
+/// <param name="visitado">Array que assinala os vértices já visitados no caminho atual.</param>
+/// <param name="caminho">Array que guarda os índices do caminho atual.</param>
+/// <param name="profundidade">Número de vértices visitados no caminho atual.</param>
+void caminhosAux(Grafo* g, int atual, int destino, int* visitado, int* caminho, int profundidade) {
+    visitado[atual] = 1;
+    caminho[profundidade] = atual;
+
+    if (atual == destino) {
+        // Caminho completo encontrado: imprimir
+        printf("Caminho encontrado:\n");
+        for (int i = 0; i <= profundidade; i++) {
+            int idx = caminho[i];
+            printf("  [%d] %c (%d, %d)\n", idx + 1, g->vertices[idx].freq, g->vertices[idx].x, g->vertices[idx].y);
+        }
+        printf("\n");
+    }
+    else {
+        Adjacente* adj = g->vertices[atual].adjacentes;
+        while (adj != NULL) {
+            if (!visitado[adj->destino]) {
+                caminhosAux(g, adj->destino, destino, visitado, caminho, profundidade + 1);
+            }
+            adj = adj->seguinte;
+        }
+    }
+
+    // Backtrack
+    visitado[atual] = 0;
+}
+
+/// <summary>
+/// Lista todos os caminhos possíveis entre dois vértices no grafo, identificados pelos seus índices.
+/// Para cada caminho encontrado, imprime a sequência completa de vértices visitados, com frequência e coordenadas.
+/// Esta função recorre à função auxiliar recursiva para realizar a travessia completa com backtracking.
+/// </summary>
+/// <param name="g">Ponteiro para o grafo.</param>
+/// <param name="origem">Índice do vértice de origem.</param>
+/// <param name="destino">Índice do vértice de destino.</param>
+void listarTodosOsCaminhos(Grafo* g, int origem, int destino) {
+    if (origem < 0 || origem >= g->tamanho || destino < 0 || destino >= g->tamanho) {
+        printf("\nIndices invalidos para origem ou destino.");
+        return;
+    }
+
+    int visitado[1000] = { 0 };
+    int caminho[1000];
+
+    printf("\nTodos os caminhos de [%d] %c (%d, %d) para [%d] %c (%d, %d):\n",
+        origem, g->vertices[origem].freq, g->vertices[origem].x, g->vertices[origem].y,
+        destino, g->vertices[destino].freq, g->vertices[destino].x, g->vertices[destino].y);
+
+    caminhosAux(g, origem, destino, visitado, caminho, 0);
+}
+
+/// <summary>
+/// Lista todos os pares possíveis entre antenas de duas frequências distintas,
+/// cuja distância euclidiana entre si seja menor ou igual ao valor fornecido.
+/// Para cada par válido, apresenta as coordenadas das duas antenas associadas.
+/// </summary>
+/// <param name="g">Ponteiro para o grafo.</param>
+/// <param name="freqA">Primeira frequência.</param>
+/// <param name="freqB">Segunda frequência.</param>
+/// <param name="distMax">Distância máxima permitida entre as antenas.</param>
+void listarIntersecoesEntreFrequencias(Grafo* g, char freqA, char freqB, float distMax) {
+    printf("\nIntersecoes entre antenas de frequencia '%c' e '%c' com distancia <= %.2f:\n\n", freqA, freqB, distMax);
+
+    for (int i = 0; i < g->tamanho; i++) {
+        if (g->vertices[i].freq == freqA) {
+            for (int j = 0; j < g->tamanho; j++) {
+                if (g->vertices[j].freq == freqB) {
+                    int dx = g->vertices[i].x - g->vertices[j].x;
+                    int dy = g->vertices[i].y - g->vertices[j].y;
+                    float dist = sqrt((float)(dx * dx + dy * dy));
+
+                    if (dist <= distMax) {
+                        printf("[%c] (%d, %d) <-> [%c] (%d, %d) | Distancia: %.2f\n",
+                            freqA, g->vertices[i].x, g->vertices[i].y,
+                            freqB, g->vertices[j].x, g->vertices[j].y,
+                            dist);
+                    }
+                }
+            }
+        }
+    }
 }
 
 
