@@ -129,6 +129,7 @@
   <ItemGroup>
     <Text Include="mapa.txt" />
     <Text Include="mapa2.txt" />
+    <Text Include="mapa3.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="funcoes.c" />

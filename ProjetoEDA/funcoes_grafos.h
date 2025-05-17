@@ -11,18 +11,19 @@
 #define FUNCOES_GRAFOS_H
 
 #include "dados.h"
-
+#include <stdbool.h>
 
 void inicializarGrafo(Grafo* g);
-int inserirVertice(Grafo* g, char freq, int x, int y);
-void inserirAresta(Grafo* g, int origem, int destino);
-void carregarGrafoDeMapa(Grafo* g, const char* ficheiro);
+bool inserirVertice(Grafo* g, char freq, int x, int y);
+bool inserirAresta(Grafo* g, int origem, int destino);
+void criarArestasPorFrequencia(Grafo* g);
+bool carregarGrafoDeMapa(Grafo* g, const char* ficheiro);
 void listarVerticesGrafo(Grafo g);
 void listarArestasGrafo(Grafo g);
 int encontrarIndicePorCoordenadas(Grafo* g, int x, int y);
 void dfsVisita(Grafo* g, int origem, int* visitado);
-void dfsPorCoordenadas(Grafo* g, int x, int y);
+void dfs(Grafo* g, int indiceOrigem);
 void bfsVisita(Grafo* g, int origem);
-void bfsPorCoordenadas(Grafo* g, int x, int y);
+void bfs(Grafo* g, int indiceOrigem);
 
 #endif  FUNCOES_GRAFOS_H

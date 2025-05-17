@@ -1,10 +1,10 @@
-/*
+Ôªø/*
  *  @file funcoes_grafos.c
  *  @author Rodrigo Pilar
  *  @date 2025-05-13
  *  @project EDA
  *
- *  ImplementaÁ„o das funÁıes da Fase 2 (grafos) do projeto.
+ *  Implementa√ß√£o das fun√ß√µes da Fase 2 (grafos) do projeto.
  */
 
 #include <stdio.h>
@@ -20,66 +20,57 @@ void inicializarGrafo(Grafo* g) {
 }
 
 /// <summary>
-/// Insere um novo vÈrtice (antena) no grafo com frequÍncia e coordenadas.
+/// Insere um novo v√©rtice (antena) no grafo com frequ√™ncia e coordenadas.
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
-/// <param name="freq">FrequÍncia da antena.</param>
+/// <param name="freq">Frequ√™ncia da antena.</param>
 /// <param name="x">Coordenada X.</param>
 /// <param name="y">Coordenada Y.</param>
-/// <returns>Õndice do vÈrtice inserido ou -1 em caso de erro.</returns>
-int inserirVertice(Grafo* g, char freq, int x, int y) {
-    if (g->tamanho >= 1000) return -1;
+/// <returns>√çndice do v√©rtice inserido ou -1 em caso de erro.</returns>
+bool inserirVertice(Grafo* g, char freq, int x, int y) {
+    if (g->tamanho >= 1000) return false;
 
     g->vertices[g->tamanho].freq = freq;
     g->vertices[g->tamanho].x = x;
     g->vertices[g->tamanho].y = y;
     g->vertices[g->tamanho].adjacentes = NULL;
 
-    return g->tamanho++;
+    g->tamanho++;
+    return true;
 }
 
 /// <summary>
-/// Insere uma ligaÁ„o (aresta) entre dois vÈrtices do grafo.
+/// Insere uma liga√ß√£o (aresta) entre dois v√©rtices do grafo.
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
-/// <param name="origem">Õndice do vÈrtice de origem.</param>
-/// <param name="destino">Õndice do vÈrtice de destino.</param>
-void inserirAresta(Grafo* g, int origem, int destino) {
+/// <param name="origem">√çndice do v√©rtice de origem.</param>
+/// <param name="destino">√çndice do v√©rtice de destino.</param>
+bool inserirAresta(Grafo* g, int origem, int destino) {
     Adjacente* novo = (Adjacente*)malloc(sizeof(Adjacente));
+    if (!novo) return false;
+
     novo->destino = destino;
-    novo->seguinte = g->vertices[origem].adjacentes;
-    g->vertices[origem].adjacentes = novo;
+    novo->seguinte = NULL;
+
+    Adjacente** atual = &g->vertices[origem].adjacentes;
+
+    // Inser√ß√£o ordenada por √≠ndice do destino
+    while (*atual != NULL && (*atual)->destino < destino) {
+        atual = &(*atual)->seguinte;
+    }
+
+    novo->seguinte = *atual;
+    *atual = novo;
+
+    return true;
 }
 
 /// <summary>
-/// Carrega os dados das antenas a partir de um ficheiro de texto.
-/// Cada antena lida È adicionada ao grafo como vÈrtice.
-/// LigaÁıes entre antenas com a mesma frequÍncia s„o automaticamente criadas.
+/// Cria arestas entre antenas com a mesma frequ√™ncia no grafo.
+/// Deve ser chamada ap√≥s todos os v√©rtices estarem inseridos.
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
-/// <param name="ficheiro">Nome do ficheiro de entrada.</param>
-void carregarGrafoDeMapa(Grafo* g, const char* ficheiro) {
-    FILE* fp = fopen(ficheiro, "r");
-    if (!fp) {
-        printf("Erro ao abrir o ficheiro.\n");
-        return;
-    }
-
-    char linha[100];
-    int linhaIdx = 1;
-
-    while (fgets(linha, sizeof(linha), fp)) {
-        for (int col = 0; linha[col] != '\0' && linha[col] != '\n'; col++) {
-            if (linha[col] != '.') {
-                inserirVertice(g, linha[col], linhaIdx, col+1);
-            }
-        }
-        linhaIdx++;
-    }
-
-    fclose(fp);
-
-    // Criar arestas entre antenas com a mesma frequÍncia
+void criarArestasPorFrequencia(Grafo* g) {
     for (int i = 0; i < g->tamanho; i++) {
         for (int j = i + 1; j < g->tamanho; j++) {
             if (g->vertices[i].freq == g->vertices[j].freq) {
@@ -91,10 +82,47 @@ void carregarGrafoDeMapa(Grafo* g, const char* ficheiro) {
 }
 
 /// <summary>
-/// Lista todos os vÈrtices (antenas) existentes no grafo,
-/// apresentando o Ìndice (a comeÁar em 1), a frequÍncia e as coordenadas (x, y).
+/// Carrega os dados das antenas a partir de um ficheiro de texto.
+/// Cada antena lida √© adicionada ao grafo como v√©rtice.
+/// Liga√ß√µes entre antenas com a mesma frequ√™ncia s√£o automaticamente criadas.
 /// </summary>
-/// <param name="g">Grafo contendo os vÈrtices (antenas).</param>
+/// <param name="g">Ponteiro para o grafo.</param>
+/// <param name="ficheiro">Nome do ficheiro de entrada.</param>
+/// <returns>True se o carregamento foi bem-sucedido; caso contr√°rio, false.</returns>
+bool carregarGrafoDeMapa(Grafo* g, const char* ficheiro) {
+    FILE* fp = fopen(ficheiro, "r");
+    if (!fp) {
+        printf("Erro ao abrir o ficheiro.\n");
+        return false;
+    }
+
+    char linha[100];
+    int linhaIdx = 1;
+
+    while (fgets(linha, sizeof(linha), fp)) {
+        for (int col = 0; linha[col] != '\0' && linha[col] != '\n'; col++) {
+            if (linha[col] != '.') {
+                if (!inserirVertice(g, linha[col], linhaIdx, col + 1)) {
+                    fclose(fp);
+                    return false;
+                }
+            }
+        }
+        linhaIdx++;
+    }
+
+    fclose(fp);
+
+    criarArestasPorFrequencia(g);
+    return true;
+}
+
+
+/// <summary>
+/// Lista todos os v√©rtices (antenas) existentes no grafo,
+/// apresentando o √≠ndice (a come√ßar em 1), a frequ√™ncia e as coordenadas (x, y).
+/// </summary>
+/// <param name="g">Grafo contendo os v√©rtices (antenas).</param>
 void listarVerticesGrafo(Grafo g) {
     printf("Vertices (Antenas):\n");
     for (int i = 0; i < g.tamanho; i++) {
@@ -103,31 +131,44 @@ void listarVerticesGrafo(Grafo g) {
 }
 
 /// <summary>
-/// Lista todas as arestas existentes no grafo,
-/// indicando as ligaÁıes entre antenas com a mesma frequÍncia.
-/// Os Ìndices s„o apresentados a comeÁar em 1.
+/// Lista todas as arestas do grafo, organizadas por v√©rtice,
+/// mostrando claramente a que v√©rtices est√° cada antena ligada.
 /// </summary>
-/// <param name="g">Grafo contendo os vÈrtices e as respetivas listas de adjacÍncia.</param>
+/// <param name="g">Grafo contendo os v√©rtices e as listas de adjac√™ncia.</param>
 void listarArestasGrafo(Grafo g) {
-    printf("Ligacoes (Arestas):\n");
+    printf("\n Ligacoes entre antenas:\n");
+
     for (int i = 0; i < g.tamanho; i++) {
+        printf("[%d] %c (%d, %d) esta ligado a:\n", i + 1, g.vertices[i].freq, g.vertices[i].x, g.vertices[i].y);
+
         Adjacente* adj = g.vertices[i].adjacentes;
+        if (!adj) {
+            printf("   (sem ligacoes)\n");
+        }
+
         while (adj != NULL) {
-            printf("  %d (%c) -> %d (%c)\n",
-                i + 1, g.vertices[i].freq,
-                adj->destino + 1, g.vertices[adj->destino].freq);
+            int dest = adj->destino;
+            printf("   -> [%d] %c (%d, %d)\n",
+                dest + 1,
+                g.vertices[dest].freq,
+                g.vertices[dest].x,
+                g.vertices[dest].y);
             adj = adj->seguinte;
         }
+
+        printf("\n"); // separa√ß√£o entre v√©rtices
     }
 }
 
+
+
 /// <summary>
-/// Procura no grafo o Ìndice de um vÈrtice com as coordenadas (x, y) dadas.
+/// Procura no grafo o √≠ndice de um v√©rtice com as coordenadas (x, y) dadas.
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
 /// <param name="x">Coordenada X da antena.</param>
 /// <param name="y">Coordenada Y da antena.</param>
-/// <returns>Õndice do vÈrtice ou -1 se n„o existir.</returns>
+/// <returns>√çndice do v√©rtice ou -1 se n√£o existir.</returns>
 int encontrarIndicePorCoordenadas(Grafo* g, int x, int y) {
     for (int i = 0; i < g->tamanho; i++) {
         if (g->vertices[i].x == x && g->vertices[i].y == y) {
@@ -138,12 +179,12 @@ int encontrarIndicePorCoordenadas(Grafo* g, int x, int y) {
 }
 
 /// <summary>
-/// FunÁ„o auxiliar recursiva para a procura em profundidade (DFS).
-/// Marca vÈrtices como visitados e imprime as suas coordenadas.
+/// Fun√ß√£o auxiliar recursiva para a procura em profundidade (DFS).
+/// Marca v√©rtices como visitados e imprime as suas coordenadas.
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
-/// <param name="atual">Õndice do vÈrtice atual.</param>
-/// <param name="visitado">Array de vÈrtices visitados.</param>
+/// <param name="atual">√çndice do v√©rtice atual.</param>
+/// <param name="visitado">Array de v√©rtices visitados.</param>
 void dfsVisita(Grafo* g, int atual, int* visitado) {
     visitado[atual] = 1;
     printf("(%d, %d) - %c\n", g->vertices[atual].x, g->vertices[atual].y, g->vertices[atual].freq);
@@ -158,30 +199,34 @@ void dfsVisita(Grafo* g, int atual, int* visitado) {
 }
 
 /// <summary>
-/// Realiza uma procura em profundidade (DFS) a partir de uma antena identificada pelas suas coordenadas.
+/// Realiza uma procura em profundidade (DFS) a partir de um v√©rtice do grafo (identificado pelo √≠ndice).
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
-/// <param name="x">Coordenada X da antena de partida.</param>
-/// <param name="y">Coordenada Y da antena de partida.</param>
-void dfsPorCoordenadas(Grafo* g, int x, int y) {
+/// <param name="indiceOrigem">√çndice do v√©rtice de partida.</param>
+void dfs(Grafo* g, int indiceOrigem) {
     int visitado[1000] = { 0 };
-    int indice = encontrarIndicePorCoordenadas(g, x, y);
 
-    if (indice == -1) {
-        printf("Antena com coordenadas (%d, %d) n„o encontrada.\n", x, y);
+    if (indiceOrigem < 0 || indiceOrigem >= g->tamanho) {
+        printf("√çndice de v√©rtice inv√°lido: %d\n", indiceOrigem);
         return;
     }
 
-    printf("DFS iniciada a partir da antena em (%d, %d):\n", x, y);
-    dfsVisita(g, indice, visitado);
+    printf("DFS iniciada a partir do v√©rtice [%d] %c (%d, %d):\n",
+        indiceOrigem + 1,
+        g->vertices[indiceOrigem].freq,
+        g->vertices[indiceOrigem].x,
+        g->vertices[indiceOrigem].y);
+
+    dfsVisita(g, indiceOrigem, visitado);
 }
 
+
 /// <summary>
-/// FunÁ„o auxiliar que executa a travessia em largura (BFS) a partir de um vÈrtice.
-/// Visita todos os vÈrtices alcanÁ·veis e imprime as respetivas coordenadas.
+/// Fun√ß√£o auxiliar que executa a travessia em largura (BFS) a partir de um v√©rtice.
+/// Visita todos os v√©rtices alcan√ß√°veis e imprime as respetivas coordenadas.
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
-/// <param name="origem">Õndice do vÈrtice de partida.</param>
+/// <param name="origem">√çndice do v√©rtice de partida.</param>
 void bfsVisita(Grafo* g, int origem) {
     int visitado[1000] = { 0 };
     int fila[1000];
@@ -207,23 +252,25 @@ void bfsVisita(Grafo* g, int origem) {
 }
 
 /// <summary>
-/// Realiza uma procura em largura (BFS) a partir de uma antena identificada pelas suas coordenadas.
-/// Lista na consola as coordenadas das antenas alcanÁadas.
+/// Realiza uma procura em largura (BFS) a partir de um v√©rtice do grafo (identificado pelo √≠ndice).
 /// </summary>
 /// <param name="g">Ponteiro para o grafo.</param>
-/// <param name="x">Coordenada X da antena de partida.</param>
-/// <param name="y">Coordenada Y da antena de partida.</param>
-void bfsPorCoordenadas(Grafo* g, int x, int y) {
-    int indice = encontrarIndicePorCoordenadas(g, x, y);
-
-    if (indice == -1) {
-        printf("Antena com coordenadas (%d, %d) n„o encontrada.\n", x, y);
+/// <param name="indiceOrigem">√çndice do v√©rtice de partida.</param>
+void bfs(Grafo* g, int indiceOrigem) {
+    if (indiceOrigem < 0 || indiceOrigem >= g->tamanho) {
+        printf("√çndice de v√©rtice inv√°lido: %d\n", indiceOrigem);
         return;
     }
 
-    printf("BFS iniciada a partir da antena em (%d, %d):\n", x, y);
-    bfsVisita(g, indice);
+    printf("BFS iniciada a partir do v√©rtice [%d] %c (%d, %d):\n",
+        indiceOrigem + 1,
+        g->vertices[indiceOrigem].freq,
+        g->vertices[indiceOrigem].x,
+        g->vertices[indiceOrigem].y);
+
+    bfsVisita(g, indiceOrigem);
 }
+
 
 
 

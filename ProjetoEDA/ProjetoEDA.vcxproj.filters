@@ -21,6 +21,7 @@
     <Text Include="mapa2.txt">
       <Filter>Arquivos de Recurso</Filter>
     </Text>
+    <Text Include="mapa3.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">

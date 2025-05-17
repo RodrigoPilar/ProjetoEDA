@@ -63,7 +63,7 @@ int main() {
     // Inicializar grafo e carregar as antenas do ficheiro
     Grafo g;
     inicializarGrafo(&g);
-    carregarGrafoDeMapa(&g, "mapa2.txt");
+    carregarGrafoDeMapa(&g, "mapa3.txt");
 
     // Listar as antenas carregadas como vértices do grafo
     listarVerticesGrafo(g);
@@ -71,8 +71,8 @@ int main() {
     // Mostrar as ligações entre as antenas com a mesma frequência
     listarArestasGrafo(g);
 
-    dfsPorCoordenadas(&g, 2, 6);
-    bfsPorCoordenadas(&g, 2, 6);
+    dfs(&g, 0);
+    bfs(&g, 0);
 
 
 #pragma endregion
