@@ -4,15 +4,20 @@
  *  @date 2025-03-29
  *  @project EDA
  *
- *  Implementa a função principal do programa, gerindo a inserção e listagem de antenas,
- *  o cálculo e listagem dos pontos com efeito nefasto, para além da criação e manipulação de uma matriz
- *  que combina antenas e nefastos. Também é possível carregar antenas de um ficheiro txt.
+ *  Implementa a função principal do programa, demonstrando as funcionalidades*  desenvolvidas nas duas fases do projeto EDA:
+ * 
+ *  - Fase 1: Inserção, listagem e remoção de antenas, cálculo de pontos com efeito nefasto e manipulação de uma matriz que representa o mapa.
+ *  - Fase 2: Representação das antenas num grafo com lista de adjacências, travessias DFS/BFS,listagem de todos os caminhos possíveis entre antenas e interseções com base na distância entre antenas de frequências distintas.
+ *            
+ *          
  */
 
 #include <stdio.h>
 #include "funcoes.h"
 #include "funcoes_grafos.h"
 
+
+// Demonstração completa das funcionalidades da Fase 1 e Fase 2 do projeto EDA
 int main() {
 #pragma region Fase 1 : Inserção e Listagem de Antenas
        Antena* listaAntenas = NULL;

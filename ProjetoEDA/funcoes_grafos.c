@@ -215,7 +215,7 @@ void dfs(Grafo* g, int indiceOrigem) {
     }
 
     printf("DFS iniciada a partir do vertice [%d] %c (%d, %d):\n",
-        indiceOrigem + 1,
+        indiceOrigem,
         g->vertices[indiceOrigem].freq,
         g->vertices[indiceOrigem].x,
         g->vertices[indiceOrigem].y);
@@ -267,7 +267,7 @@ void bfs(Grafo* g, int indiceOrigem) {
     }
 
     printf("BFS iniciada a partir do vertice [%d] %c (%d, %d):\n",
-        indiceOrigem + 1,
+        indiceOrigem,
         g->vertices[indiceOrigem].freq,
         g->vertices[indiceOrigem].x,
         g->vertices[indiceOrigem].y);
@@ -295,7 +295,7 @@ void caminhosAux(Grafo* g, int atual, int destino, int* visitado, int* caminho, 
         printf("Caminho encontrado:\n");
         for (int i = 0; i <= profundidade; i++) {
             int idx = caminho[i];
-            printf("  [%d] %c (%d, %d)\n", idx + 1, g->vertices[idx].freq, g->vertices[idx].x, g->vertices[idx].y);
+            printf("  [%d] %c (%d, %d)\n", idx, g->vertices[idx].freq, g->vertices[idx].x, g->vertices[idx].y);
         }
         printf("\n");
     }

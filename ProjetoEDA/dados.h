@@ -3,11 +3,17 @@
  *  @author Rodrigo Pilar
  *  @date 2025-03-29
  *  @project EDA
+ * 
+ * Declara as estruturas de dados utilizadas no projeto:
  *
- *  Declara as estruturas de dados utilizadas no projeto:
- *      - Antena: Armazena a frequência, coordenadas (x, y) e ponteiro para a próxima antena.
- *      - Nefasto: Armazena as coordenadas (x, y) e ponteiro para o próximo elemento.
- *      - Grafo: Armazena uma rede de antenas como grafo com lista de adjacências.
+ * Fase 1:
+ *  - Antena: Armazena a frequência, coordenadas (x, y) e ponteiro para a próxima antena.
+ *  - Nefasto: Armazena coordenadas de efeitos nefastos e ponteiro para o próximo.
+ *
+ * Fase 2:
+ *  - Adjacente: Representa uma ligação entre vértices no grafo.
+ *  - Vertice: Representa uma antena com lista de adjacentes.
+ *  - Grafo: Contém todos os vértices (antenas) e respetivas ligações.
  */
 
 #ifndef DADOS_H
@@ -66,4 +72,4 @@ typedef struct {
 
 #pragma endregion
 
-#endif  DADOS_H
+#endif  // DADOS_H
